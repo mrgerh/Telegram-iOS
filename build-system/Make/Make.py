@@ -46,6 +46,7 @@ class BazelCommandLine:
         self.enable_sandbox = False
         self.disable_provisioning_profiles = False
 
+        explanations = '{}/explanations.txt'.format(os.getcwd()) # Fork
         self.common_args = [
             # https://docs.bazel.build/versions/master/command-line-reference.html
             # Ask bazel to print the actual resolved command line options.
@@ -67,6 +68,8 @@ class BazelCommandLine:
 
             # Asynchronously upload cache artifacts
             '--experimental_remote_cache_async',
+            '--verbose_explanations', # Fork
+            '--explain={}'.format(explanations) # Fork
         ]
 
         self.common_build_args = [
