@@ -433,6 +433,8 @@ final class PeerMessagesMediaPlaylist: SharedMediaPlaylist {
             self.loadingItem = false
             self.currentItem = (message, [])
             self.updateState()
+        case .singleFile(_):
+            break
         }
     }
     
@@ -638,6 +640,9 @@ final class PeerMessagesMediaPlaylist: SharedMediaPlaylist {
                 }
             case let .index(index):
                 switch self.messagesLocation {
+                case .singleFile(_):
+                    break
+                    
                     case let .messages(chatLocation, tagMask, _):
                         var inputIndex: Signal<MessageIndex?, NoError>?
                         let looping = self.looping
@@ -889,5 +894,107 @@ final class PeerMessagesMediaPlaylist: SharedMediaPlaylist {
             }
             let _ = self.context.engine.messages.markMessageContentAsConsumedInteractively(messageId: item.message.id).startStandalone()
         }
+    }
+}
+
+struct SingleFilePlaylistItemId: SharedMediaPlaylistItemId {
+    let fileId: MediaId
+    
+    func isEqual(to: SharedMediaPlaylistItemId) -> Bool {
+        if let to = to as? SingleFilePlaylistItemId {
+            return self.fileId == to.fileId
+        }
+        return false
+    }
+}
+
+final class SingleFileMediaPlaylistItem: SharedMediaPlaylistItem {
+    let id: SharedMediaPlaylistItemId
+    let file: TelegramMediaFile
+    
+    init(file: TelegramMediaFile) {
+        self.file = file
+        self.id = SingleFilePlaylistItemId(fileId: file.id!) //TODO: avoid force unwrap
+    }
+    
+    var stableId: AnyHashable {
+        return file.id as AnyHashable
+    }
+    
+    var playbackData: SharedMediaPlaybackData? {
+        let fileReference = FileMediaReference.standalone(media: file)
+        let source = SharedMediaPlaybackDataSource.telegramFile(reference: fileReference, isCopyProtected: false, isViewOnce: false)
+        
+        if file.isVoice {
+            return SharedMediaPlaybackData(type: .voice, source: source)
+        } else if file.isMusic {
+            return SharedMediaPlaybackData(type: .music, source: source)
+        }
+        return nil
+    }
+    
+    var displayData: SharedMediaPlaybackDisplayData? {
+        if file.isVoice {
+            return SharedMediaPlaybackDisplayData.voice(author: nil, peer: nil)
+        } else if file.isMusic {
+            let title = file.fileName ?? ""
+            return SharedMediaPlaybackDisplayData.music(title: title, performer: nil, albumArt: nil, long: false, caption: nil)
+        }
+        return nil
+    }
+}
+
+final class SingleFileMediaPlaylist: SharedMediaPlaylist {
+    private let file: TelegramMediaFile
+    private var order: MusicPlaybackSettingsOrder = .regular
+    private(set) var looping: MusicPlaybackSettingsLooping = .none
+    
+    let id: SharedMediaPlaylistId
+    
+    var location: SharedMediaPlaylistLocation {
+        return PeerMessagesMediaPlaylistId.singleFile(file.fileId)
+    }
+    
+    var currentItemDisappeared: (() -> Void)?
+    
+    private let stateValue = Promise<SharedMediaPlaylistState>()
+    var state: Signal<SharedMediaPlaylistState, NoError> {
+        return self.stateValue.get()
+    }
+    
+    init(file: TelegramMediaFile) {
+        self.file = file
+        self.id = PeerMessagesMediaPlaylistId.singleFile(file.id!) //TODO: avoid force unwrap
+        self.updateState()
+    }
+    
+    func control(_ action: SharedMediaPlaylistControlAction) {
+        // Single file playlist doesn't support next/previous
+    }
+    
+    func setOrder(_ order: MusicPlaybackSettingsOrder) {
+        self.order = order
+        self.updateState()
+    }
+    
+    func setLooping(_ looping: MusicPlaybackSettingsLooping) {
+        self.looping = looping
+        self.updateState()
+    }
+    
+    func onItemPlaybackStarted(_ item: SharedMediaPlaylistItem) {
+    }
+    
+    private func updateState() {
+        let item = SingleFileMediaPlaylistItem(file: self.file)
+        self.stateValue.set(.single(SharedMediaPlaylistState(
+            loading: false,
+            playedToEnd: false,
+            item: item,
+            nextItem: nil,
+            previousItem: nil,
+            order: self.order,
+            looping: self.looping
+        )))
     }
 }
