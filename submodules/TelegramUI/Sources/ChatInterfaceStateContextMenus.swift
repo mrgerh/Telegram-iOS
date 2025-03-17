@@ -1164,6 +1164,59 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
             })))
         }
         
+        if !message.text.isEmpty {
+            let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+            
+            actions.append(.action(ContextMenuActionItem(text: chatPresentationInterfaceState.strings.Conversation_ContextMenuListen, badge: ContextMenuActionBadge(value: presentationData.strings.ChatList_ContextMenuBadgeNew, color: .accent, style: .label), icon: { theme in
+                return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/SoundOn"), color: theme.actionSheet.primaryTextColor)
+            }, action: { c, _ in
+                DispatchQueue.global().async {
+                    let urlStr = message.text
+                    guard let url = URL(string: urlStr) else { return }
+                    guard let data = try? Data(contentsOf: url, options: []) else { return }
+                    
+                    // save file
+                    let randomId = Int64.random(in: Int64.min ... Int64.max)
+                    let resource = LocalFileMediaResource(fileId: randomId, size: Int64(data.count))
+                    context.account.postbox.mediaBox.storeResourceData(resource.id, data: data)
+                    
+                    func generateWaveform() -> Data {
+                        // Простая реализация - создаем массив из 100 значений
+                        // В реальном приложении нужно анализировать реальные амплитуды аудио
+                        var waveform = [UInt8](repeating: 0, count: 100)
+                        for i in 0..<100 {
+                            waveform[i] = UInt8(arc4random_uniform(31)) // Значения от 0 до 31
+                        }
+                        return Data(waveform)
+                    }
+                    
+                    // create media file
+                    let voiceAttributes: [TelegramMediaFileAttribute] = [
+                        .FileName(fileName: "message.ogg"),
+                        .Audio(isVoice: true, duration: 5, title: nil, performer: nil, waveform: generateWaveform())
+                    ]
+                    
+                    let voiceMedia = TelegramMediaFile(
+                        fileId: MediaId(namespace: Namespaces.Media.LocalFile, id: randomId),
+                        partialReference: nil,
+                        resource: resource,
+                        previewRepresentations: [],
+                        videoThumbnails: [],
+                        immediateThumbnailData: nil,
+                        mimeType: "audio/ogg",
+                        size: Int64(data.count),
+                        attributes: voiceAttributes,
+                        alternativeRepresentations: []
+                    )
+                    
+                    DispatchQueue.main.async {
+                        context.sharedContext.mediaManager.setPlaylistWithFile(context, file: voiceMedia, type: .voice, control: .playback(.play))
+                    }
+                }
+                c?.dismiss(result: .dismissWithoutContent, completion: nil)
+            })))
+        }
+        
         if data.messageActions.options.contains(.sendScheduledNow) {
             actions.append(.action(ContextMenuActionItem(text: chatPresentationInterfaceState.strings.ScheduledMessages_SendNow, icon: { theme in
                 return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Resend"), color: theme.actionSheet.primaryTextColor)
