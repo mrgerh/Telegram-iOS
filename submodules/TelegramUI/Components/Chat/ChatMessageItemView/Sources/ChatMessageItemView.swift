@@ -174,7 +174,7 @@ public final class ChatMessageAccessibilityData {
                                         hint = item.presentationData.strings.VoiceOver_Chat_PlayHint
                                     }
                                     traits.insert(.startsMediaSession)
-                                    if isVoice {
+                                    if isVoice { // here, just accessibility data
                                         let durationString = voiceMessageDurationFormatter.string(from: Double(duration)) ?? ""
                                         if isIncoming {
                                             if announceIncomingAuthors, let authorName = authorName {

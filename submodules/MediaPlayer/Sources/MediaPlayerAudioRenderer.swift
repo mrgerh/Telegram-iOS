@@ -643,6 +643,7 @@ private final class AudioPlayerRendererContext {
                 return
             }
             
+            // see this log in console
             print("\(CFAbsoluteTimeGetCurrent()) MediaPlayerAudioRenderer initialize audio unit: \((CFAbsoluteTimeGetCurrent() - startTime) * 1000.0) ms")
             
             self.audioGraph = audioGraph
@@ -665,7 +666,7 @@ private final class AudioPlayerRendererContext {
                 self.closeAudioUnit()
                 return
             }
-            
+            // see this log in console
             print("\(CFAbsoluteTimeGetCurrent()) MediaPlayerAudioRenderer start audio unit: \((CFAbsoluteTimeGetCurrent() - startTime) * 1000.0) ms")
         }
     }

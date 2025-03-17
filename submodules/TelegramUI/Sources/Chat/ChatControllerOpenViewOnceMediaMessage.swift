@@ -134,7 +134,7 @@ extension ChatControllerImpl {
         }
         
         let isIncoming = message.effectivelyIncoming(self.context.account.peerId)
-        
+        //here?
         var presentImpl: ((ViewController) -> Void)?
         let configuration = ContextController.Configuration(
             sources: [

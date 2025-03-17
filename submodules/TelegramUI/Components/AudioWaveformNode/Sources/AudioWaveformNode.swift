@@ -59,7 +59,7 @@ public final class AudioWaveformNode: ASDisplayNode {
     
     public func setup(color: UIColor, gravity: Gravity, waveform: AudioWaveform?) {
         if self.color == nil || !self.color!.isEqual(color) || self.waveform != waveform || self.gravity != gravity {
-            self.color = color
+            self.color = .red
             self.gravity = gravity
             self.waveform = waveform
             self.setNeedsDisplay()

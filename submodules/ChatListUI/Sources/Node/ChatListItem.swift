@@ -1507,6 +1507,8 @@ public class ChatListItemNode: ItemListRevealOptionsItemNode {
     }
     
     required init() {
+        // message view?
+        
         self.backgroundNode = ASDisplayNode()
         self.backgroundNode.isLayerBacked = true
         self.backgroundNode.displaysAsynchronously = false

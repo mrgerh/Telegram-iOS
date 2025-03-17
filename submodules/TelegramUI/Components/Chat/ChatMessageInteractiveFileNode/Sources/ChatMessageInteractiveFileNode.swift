@@ -40,7 +40,7 @@ private struct FetchControls {
     let cancel: () -> Void
 }
 
-public final class ChatMessageInteractiveFileNode: ASDisplayNode {
+public final class ChatMessageInteractiveFileNode: ASDisplayNode { // here
     public final class Arguments {
         public let context: AccountContext
         public let presentationData: ChatPresentationData
@@ -324,6 +324,7 @@ public final class ChatMessageInteractiveFileNode: ASDisplayNode {
                             fetch(true)
                         }
                     case .Local:
+                        // entry point
                         self.activateLocalContent()
                     }
                 }
@@ -1291,13 +1292,14 @@ public final class ChatMessageInteractiveFileNode: ASDisplayNode {
                                 let waveformColor: UIColor
                                 if arguments.incoming {
                                     if consumableContentIcon != nil {
-                                        waveformColor = messageTheme.mediaActiveControlColor
+//                                        waveformColor = messageTheme.mediaActiveControlColor
                                     } else {
-                                        waveformColor = messageTheme.mediaInactiveControlColor
+//                                        waveformColor = messageTheme.mediaInactiveControlColor
                                     }
                                 } else {
-                                    waveformColor = messageTheme.mediaInactiveControlColor
+//                                    waveformColor = messageTheme.mediaInactiveControlColor
                                 }
+                                waveformColor = .purple
                                 
                                 var isTranscriptionInProgress = false
                                 if case .inProgress = effectiveAudioTranscriptionState {

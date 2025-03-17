@@ -2732,6 +2732,7 @@ final class StorageUsageScreenComponent: Component {
         }
         
         private func openMessage(message: Message) {
+            // play?
             guard let component = self.component else {
                 return
             }

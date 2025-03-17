@@ -1439,7 +1439,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
         }
     }
     
-    private static func beginLayout(
+    private static func beginLayout( // here
         selfReference: Weak<ChatMessageBubbleItemNode>,
         _ item: ChatMessageItem,
         _ params: ListViewItemLayoutParams,
@@ -1466,7 +1466,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
     ) -> (ListViewItemNodeLayout, (ListViewItemUpdateAnimation, ListViewItemApply, Bool) -> Void) {
         let isPreview = item.presentationData.isPreview
         let accessibilityData = ChatMessageAccessibilityData(item: item, isSelected: isSelected)
-        
+        // message here
         let fontSize = floor(item.presentationData.fontSize.baseDisplaySize * 14.0 / 17.0)
         let nameFont = Font.semibold(fontSize)
 
@@ -1803,6 +1803,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
                 }
             }
             if !found {
+                // if comment, then bubbless are empty
                 let contentNode = (contentNodeItem.type as! ChatMessageBubbleContentNode.Type).init()
                 contentNode.index = contentNodeItem.bubbleAttributes.index
                 contentPropertiesAndPrepareLayouts.append((contentNodeItem.message, contentNode.supportsMosaic, contentNodeItem.attributes, contentNodeItem.bubbleAttributes, contentNode.asyncLayoutContent()))
@@ -3194,7 +3195,7 @@ public class ChatMessageBubbleItemNode: ChatMessageItemView, ChatMessagePreviewI
             )
         })
     }
-    
+    // here?
     private static func applyLayout(selfReference: Weak<ChatMessageBubbleItemNode>,
         _ animation: ListViewItemUpdateAnimation,
         _ synchronousLoads: Bool,

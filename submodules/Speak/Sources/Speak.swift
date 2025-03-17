@@ -43,7 +43,7 @@ public func supportedSpeakLanguages() -> Set<String> {
     return Set(languages)
 }
 
-public func speakText(context: AccountContext, text: String) -> SpeechSynthesizerHolder? {
+public func speakText(context: AccountContext, text: String) -> SpeechSynthesizerHolder? { // here
     guard !text.isEmpty else {
         return nil
     }

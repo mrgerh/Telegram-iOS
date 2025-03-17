@@ -6,7 +6,7 @@ import CoreMedia
 import TelegramCore
 import TelegramAudio
 
-private let traceEvents = false
+private let traceEvents = true
 
 private struct MediaPlayerControlTimebase {
     let timebase: CMTimebase

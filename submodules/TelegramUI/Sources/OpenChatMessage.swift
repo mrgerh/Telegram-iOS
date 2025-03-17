@@ -274,8 +274,10 @@ func openChatMessageImpl(_ params: OpenChatMessageParams) -> Bool {
                 }
                 return true
             case let .audio(file):
+            // goes here
                 let location: PeerMessagesPlaylistLocation
                 let playerType: MediaManagerPlayerType
+            // player creation
                 var control = SharedMediaPlayerControlAction.playback(.play)
                 if case let .timecode(time) = params.mode {
                     control = .seek(time)
@@ -308,6 +310,7 @@ func openChatMessageImpl(_ params: OpenChatMessageParams) -> Bool {
                     }
                     playerType = (file.isVoice || file.isInstantVideo) ? .voice : .file
                 }
+                // set playlist
                 params.context.sharedContext.mediaManager.setPlaylist((params.context, PeerMessagesMediaPlaylist(context: params.context, location: location, chatLocationContextHolder: params.chatLocationContextHolder)), type: playerType, control: control)
                 return true
             case let .story(storyController):

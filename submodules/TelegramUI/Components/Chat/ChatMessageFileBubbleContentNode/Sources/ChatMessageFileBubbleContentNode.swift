@@ -34,6 +34,7 @@ public class ChatMessageFileBubbleContentNode: ChatMessageBubbleContentNode {
     }
     
     required public init() {
+        // here?
         self.interactiveFileNode = ChatMessageInteractiveFileNode()
         
         super.init()

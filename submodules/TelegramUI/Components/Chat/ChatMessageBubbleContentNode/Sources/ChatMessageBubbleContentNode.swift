@@ -202,14 +202,14 @@ public final class ChatMessageBubbleContentItem {
         self.isItemEdited = isItemEdited
     }
 }
-
+/// seems like the view I am looking for
 open class ChatMessageBubbleContentNode: ASDisplayNode {
     open var supportsMosaic: Bool {
         return false
     }
     
     open var index: Int?
-    
+        // look children here
     public weak var itemNode: ChatMessageItemNodeProtocol?
     public weak var bubbleBackgroundNode: ChatMessageBackground?
     public weak var bubbleBackdropNode: ChatMessageBubbleBackdrop?
