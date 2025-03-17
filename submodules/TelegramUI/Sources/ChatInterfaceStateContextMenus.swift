@@ -1213,44 +1213,13 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
                         alternativeRepresentations: []
                     )
                     
-                    print(voiceMedia)
-                    // Добавляем голосовой файл к существующим медиа
-                    
-//                    requestEditMessage(messageId: MessageId,
-//                                       text: String,
-//                                       media: RequestEditMessageMedia,
-//                                       entities: TextEntitiesMessageAttribute?,
-//                                       inlineStickers: [MediaId: Media],
-//                                       webpagePreviewAttribute: WebpagePreviewMessageAttribute? = nil,
-//                                       invertMediaAttribute: InvertMediaMessageAttribute? = nil,
-//                                       disableUrlPreview: Bool = false,
-//                                       scheduleTime: Int32? = nil) -> Signal<RequestEditMessageResult, RequestEditMessageError>
-                    
-//                    _ = context.engine.messages.requestEditMessage(messageId: message.id,
-//                                                                   text: message.text,
-////                                                                   media: .keep,
-//                                                                   media: .update(.standalone(media: voiceMedia)),
-//                                                                   entities: nil,
-//                                                                   inlineStickers: [:]).start()
-                    
-                    // Создаем location
-//                    let location = PeerMessagesPlaylistLocation.messages(
-////                        chatLocation: chatPresentationInterfaceState.chatLocation,
-//                        chatLocation: .peer(id: message.id.peerId),
-//                        tagMask: .voiceOrInstantVideo,
-//                        at: message.id)
-                    
-//                    let location = PeerMessagesPlaylistLocation.singleMessage(message.id)
-
                     DispatchQueue.main.async {
                         context.sharedContext.mediaManager.setPlaylistWithFile(context, file: voiceMedia, type: .voice, control: .playback(.play))
-                        
-//                        context.sharedContext.mediaManager.setPlaylist(
-//                            (context, PeerMessagesMediaPlaylist(context: context, location: location, chatLocationContextHolder: nil)),
-//                            type: .voice,
-//                            control: .playback(.play))
+
                     }
                 }
+                
+                c?.dismiss(result: .dismissWithoutContent, completion: nil)
                 
 //                interfaceInteraction.setupReplyMessage(messages[0].id, { transition, completed in
 //                    c?.dismiss(result: .custom(transition), completion: {
@@ -1353,7 +1322,8 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
                     if !isCopyProtected {
                         actions.append(.action(ContextMenuActionItem(text: chatPresentationInterfaceState.strings.Conversation_ContextMenuCopy, icon: { theme in
                             return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/Copy"), color: theme.actionSheet.primaryTextColor)
-                        }, action: { _, f in
+                        }, action:
+                                                                        { _, f in
                             if let diceEmoji = diceEmoji {
                                 UIPasteboard.general.string = diceEmoji
                             } else {
