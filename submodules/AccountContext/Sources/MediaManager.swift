@@ -8,17 +8,26 @@ import TelegramAudio
 import UniversalMediaPlayer
 import RangeSet
 
-public enum PeerMessagesMediaPlaylistId: Equatable, SharedMediaPlaylistId {
+public enum PeerMessagesMediaPlaylistId: Equatable, SharedMediaPlaylistId, SharedMediaPlaylistLocation {
     case peer(PeerId)
     case recentActions(PeerId)
     case feed(Int32)
     case custom
+    case singleFile(MediaId)
     
     public func isEqual(to: SharedMediaPlaylistId) -> Bool {
         if let to = to as? PeerMessagesMediaPlaylistId {
             return self == to
         }
         return false
+    }
+    
+    public func isEqual(to: SharedMediaPlaylistLocation) -> Bool {
+        if let to = to as? PeerMessagesMediaPlaylistId {
+            return self == to
+        } else {
+            return false
+        }
     }
 }
     
@@ -27,6 +36,7 @@ public enum PeerMessagesPlaylistLocation: Equatable, SharedMediaPlaylistLocation
     case singleMessage(MessageId)
     case recentActions(Message)
     case custom(messages: Signal<([Message], Int32, Bool), NoError>, at: MessageId, loadMore: (() -> Void)?)
+    case singleFile(TelegramMediaFile)
 
     public var playlistId: PeerMessagesMediaPlaylistId {
         switch self {
@@ -45,6 +55,8 @@ public enum PeerMessagesPlaylistLocation: Equatable, SharedMediaPlaylistLocation
                 return .recentActions(message.id.peerId)
             case .custom:
                 return .custom
+            case let .singleFile(file):
+                return .singleFile(file.id!) // force unwrap?
         }
     }
     
@@ -87,6 +99,12 @@ public enum PeerMessagesPlaylistLocation: Equatable, SharedMediaPlaylistLocation
                 }
             case let .custom(_, lhsAt, _):
                 if case let .custom(_, rhsAt, _) = rhs, lhsAt == rhsAt {
+                    return true
+                } else {
+                    return false
+                }
+            case let .singleFile(lhsFile):
+            if case let .singleFile(rhsFile) = rhs, lhsFile.fileId == rhsFile.fileId {
                     return true
                 } else {
                     return false
@@ -147,6 +165,7 @@ public protocol MediaManager: AnyObject {
     var activeGlobalMediaPlayerAccountId: Signal<(AccountRecordId, Bool)?, NoError> { get }
     
     func setPlaylist(_ playlist: (AccountContext, SharedMediaPlaylist)?, type: MediaManagerPlayerType, control: SharedMediaPlayerControlAction)
+    func setPlaylistWithFile(_ context: AccountContext, file: TelegramMediaFile, type: MediaManagerPlayerType, control: SharedMediaPlayerControlAction)
     func playlistControl(_ control: SharedMediaPlayerControlAction, type: MediaManagerPlayerType?)
     
     func filteredPlaylistState(accountId: AccountRecordId, playlistId: SharedMediaPlaylistId, itemId: SharedMediaPlaylistItemId, type: MediaManagerPlayerType) -> Signal<SharedMediaPlayerItemPlaybackState?, NoError>

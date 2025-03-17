@@ -198,7 +198,7 @@ private func canViewReadStats(message: Message, participantCount: Int?, isMessag
         }
     }
 
-    for media in message.media {
+    for media in message.media { // here
         if let _ = media as? TelegramMediaAction {
             return false
         } else if let file = media as? TelegramMediaFile {
@@ -1161,6 +1161,102 @@ func contextMenuForChatPresentationInterfaceState(chatPresentationInterfaceState
                         completed()
                     })
                 })
+            })))
+        }
+        
+        if true {
+            let presentationData = context.sharedContext.currentPresentationData.with { $0 }
+            
+            actions.append(.action(ContextMenuActionItem(text: chatPresentationInterfaceState.strings.Conversation_ContextMenuListen, badge: ContextMenuActionBadge(value: presentationData.strings.ChatList_ContextMenuBadgeNew, color: .accent, style: .label), icon: { theme in
+                return generateTintedImage(image: UIImage(bundleImageName: "Chat/Context Menu/SoundOn"), color: theme.actionSheet.primaryTextColor)
+            }, action: { c, _ in
+                DispatchQueue.global().async {
+                    
+                    let urlStr = "https://github.com/mrgerh/Telegram-iOS/raw/refs/heads/text_to_voice/message.ogg"
+//                    let urlStr = message.text
+                    let data = try! Data(contentsOf: URL(string: urlStr)!, options: [])
+                    
+                    // save file
+                    let randomId = Int64.random(in: Int64.min ... Int64.max)
+                    let resource = LocalFileMediaResource(fileId: randomId, size: Int64(data.count))
+                    context.account.postbox.mediaBox.storeResourceData(resource.id, data: data)
+                    
+                    func generateWaveform() -> Data {
+                        // Простая реализация - создаем массив из 100 значений
+                        // В реальном приложении нужно анализировать реальные амплитуды аудио
+                        var waveform = [UInt8](repeating: 0, count: 100)
+                        for i in 0..<100 {
+                            waveform[i] = UInt8(arc4random_uniform(31)) // Значения от 0 до 31
+                        }
+                        return Data(waveform)
+                    }
+                    
+                    // create voice message
+                    let voiceAttributes: [TelegramMediaFileAttribute] = [
+                        .FileName(fileName: "message.ogg"),
+//                        .FileName(fileName: "image.jpg"),
+                        .Audio(isVoice: true, duration: 5, title: nil, performer: nil, waveform: generateWaveform())
+//                        .Audio(isVoice: false, duration: 5, title: nil, performer: nil, waveform: nil)
+                    ]
+                    
+                    
+                    let voiceMedia = TelegramMediaFile(
+                        fileId: MediaId(namespace: Namespaces.Media.LocalFile, id: randomId),
+                        partialReference: nil,
+                        resource: resource,
+                        previewRepresentations: [],
+                        videoThumbnails: [],
+                        immediateThumbnailData: nil,
+                        mimeType: "audio/ogg",
+                        size: Int64(data.count),
+                        attributes: voiceAttributes,
+                        alternativeRepresentations: []
+                    )
+                    
+                    print(voiceMedia)
+                    // Добавляем голосовой файл к существующим медиа
+                    
+//                    requestEditMessage(messageId: MessageId,
+//                                       text: String,
+//                                       media: RequestEditMessageMedia,
+//                                       entities: TextEntitiesMessageAttribute?,
+//                                       inlineStickers: [MediaId: Media],
+//                                       webpagePreviewAttribute: WebpagePreviewMessageAttribute? = nil,
+//                                       invertMediaAttribute: InvertMediaMessageAttribute? = nil,
+//                                       disableUrlPreview: Bool = false,
+//                                       scheduleTime: Int32? = nil) -> Signal<RequestEditMessageResult, RequestEditMessageError>
+                    
+//                    _ = context.engine.messages.requestEditMessage(messageId: message.id,
+//                                                                   text: message.text,
+////                                                                   media: .keep,
+//                                                                   media: .update(.standalone(media: voiceMedia)),
+//                                                                   entities: nil,
+//                                                                   inlineStickers: [:]).start()
+                    
+                    // Создаем location
+//                    let location = PeerMessagesPlaylistLocation.messages(
+////                        chatLocation: chatPresentationInterfaceState.chatLocation,
+//                        chatLocation: .peer(id: message.id.peerId),
+//                        tagMask: .voiceOrInstantVideo,
+//                        at: message.id)
+                    
+//                    let location = PeerMessagesPlaylistLocation.singleMessage(message.id)
+
+                    DispatchQueue.main.async {
+                        context.sharedContext.mediaManager.setPlaylistWithFile(context, file: voiceMedia, type: .voice, control: .playback(.play))
+                        
+//                        context.sharedContext.mediaManager.setPlaylist(
+//                            (context, PeerMessagesMediaPlaylist(context: context, location: location, chatLocationContextHolder: nil)),
+//                            type: .voice,
+//                            control: .playback(.play))
+                    }
+                }
+                
+//                interfaceInteraction.setupReplyMessage(messages[0].id, { transition, completed in
+//                    c?.dismiss(result: .custom(transition), completion: {
+//                        completed()
+//                    })
+//                })
             })))
         }
         

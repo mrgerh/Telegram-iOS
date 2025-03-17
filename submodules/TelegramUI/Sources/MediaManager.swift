@@ -505,7 +505,7 @@ public final class MediaManagerImpl: NSObject, MediaManager {
                                     continueInstantVideoLoopAfterFinish = playlist.context.sharedContext.energyUsageSettings.autoplayVideo
                                     controlPlaybackWithProximity = playlist.context.sharedContext.currentMediaInputSettings.with({ $0.enableRaiseToSpeak })
                                 }
-                                
+                                // voiceMediaPlayer creating
                                 let voiceMediaPlayer = SharedMediaPlayer(context: context, mediaManager: strongSelf, inForeground: strongSelf.inForeground, account: context.account, audioSession: strongSelf.audioSession, overlayMediaManager: strongSelf.overlayMediaManager, playlist: playlist, initialOrder: .reversed, initialLooping: .none, initialPlaybackRate: settings.voicePlaybackRate, playerIndex: nextPlayerIndex, controlPlaybackWithProximity: controlPlaybackWithProximity, type: type, continueInstantVideoLoopAfterFinish: continueInstantVideoLoopAfterFinish)
                                 strongSelf.voiceMediaPlayer = voiceMediaPlayer
                                 voiceMediaPlayer.playedToEnd = { [weak voiceMediaPlayer] in
@@ -564,6 +564,11 @@ public final class MediaManagerImpl: NSObject, MediaManager {
                 }
             }
         }), forKey: type)
+    }
+    
+    public func setPlaylistWithFile(_ context: AccountContext, file: TelegramMediaFile, type: MediaManagerPlayerType, control: SharedMediaPlayerControlAction) {
+        let playlist = SingleFileMediaPlaylist(file: file)
+        self.setPlaylist((context, playlist), type: type, control: control)
     }
     
     public func playlistControl(_ control: SharedMediaPlayerControlAction, type: MediaManagerPlayerType?) {

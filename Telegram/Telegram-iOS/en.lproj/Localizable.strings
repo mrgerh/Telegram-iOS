@@ -1309,6 +1309,8 @@
 
 "FeatureDisabled.Oops" = "Oops";
 
+"Conversation.ContextMenuListen" = "Listen";
+
 "Conversation.ContextMenuReply" = "Reply";
 
 "ForwardedMessages_1" = "Forwarded message";
